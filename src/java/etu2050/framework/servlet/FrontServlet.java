@@ -4,19 +4,21 @@
  */
 package etu2050.framework.servlet;
 
+import etu2050.framework.Mapping;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 
 /**
  *
  * @author liantsiky
  */
 public class FrontServlet extends HttpServlet {
-
+    HashMap<String,Mapping> MappingUrls;
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
