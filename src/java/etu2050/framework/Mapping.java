@@ -11,4 +11,15 @@ package etu2050.framework;
 public class Mapping {
     String className;
     String method;
+    
+    public Mapping(String ClassName,String meThod){
+        
+    }
+    
+    public String getclassName(){return this.className;}
+    public String getmethod(){return this.method;}
+    
+    public void setclassName(String classe) {this.className=classe;}
+    public void setmethod(String fonction) {this.className=fonction;}
+
 }
