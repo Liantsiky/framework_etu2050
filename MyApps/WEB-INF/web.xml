@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE web-app>
+<web-app>
+    <servlet>
+        <servlet-name>FrontServlet</servlet-name>
+        <servlet-class>etu2050.framework.servlet.FrontServlet</servlet-class>
+        <init-param>
+            <param-name>root</param-name>
+            <param-value></param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FrontServlet</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+    </session-config>
+    
+</web-app>
