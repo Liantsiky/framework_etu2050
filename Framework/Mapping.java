@@ -13,13 +13,14 @@ public class Mapping {
     String method;
     
     public Mapping(String ClassName,String meThod){
-        
+        setclassName(ClassName);
+        setmethod(meThod);
     }
     
     public String getclassName(){return this.className;}
     public String getmethod(){return this.method;}
     
     public void setclassName(String classe) {this.className=classe;}
-    public void setmethod(String fonction) {this.className=fonction;}
+    public void setmethod(String fonction) {this.method=fonction;}
 
 }
