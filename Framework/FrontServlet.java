@@ -19,6 +19,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  *
@@ -66,19 +67,16 @@ public class FrontServlet extends HttpServlet {
             String url = MyUtils.getURL(uri);
             if( this.getUrlMapping().containsKey(url)) {
                 Mapping check= (Mapping) getUrlMapping().get(url);
-                // out.print(check.getmethod());
                 Class<?> closs = Class.forName(check.getclassName());
-                // out.print(closs);
                 Object checkreturn= Class.forName(check.getclassName()).getMethod(check.getmethod()).invoke(Class.forName(check.getclassName()).getConstructor().newInstance());
-                // out.println(checkreturn);
                 if ( checkreturn instanceof Modelview){
                     Modelview page = (Modelview) checkreturn;
+                    for(String key : page.getData().keySet()) {
+                        request.setAttribute(key,page.getData().get(key));
 
-                    // out.println(page.getPageJsp());
+                    }
                     request.getRequestDispatcher(page.getPageJsp()).forward(request,response);
                 }
-
-            
             }
         } catch (Exception ex) {
             Logger.getLogger(FrontServlet.class.getName()).log(Level.SEVERE, null, ex);

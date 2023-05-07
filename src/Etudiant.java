@@ -5,7 +5,11 @@
 package models;
 
 import etu2050.framework.annotations.Url;
+
+import java.util.HashMap;
+
 import etu2050.framework.Modelview;
+
 
 /**
  *
@@ -15,8 +19,13 @@ public class Etudiant {
     
     @Url(lien="getEtudiant")
     public Modelview getEtudiant(){
-        Modelview result = new Modelview();
+        HashMap <String,Object> o= new HashMap<>();
+        Modelview result = new Modelview(o);
+
+        result.addItem("test", "bonjour");
+        result.addItem("test2", 123);
         result.setPageJsp("Etudiant.jsp");
+        
         return result;
     }
 }
