@@ -12,18 +12,55 @@ import etu2050.framework.Modelview;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.function.Function;
+import jakarta.servlet.http.HttpServletRequest;
+
 /**
  *
  * @author liantsiky
  */
 public class MyUtils {
     
+    //attribut Hashmap contenant les classes et les functions qui les parse
+    public static final HashMap <Class <?>, Function<String,?>> PARSING = new HashMap<>();
+    static{
+        PARSING.put(int.class, Integer::parseInt);
+        PARSING.put(double.class, Double :: parseDouble);
+        PARSING.put(String.class, Function.identity());
+    }
+    
+
+    /**
+     * function that set the attribut of the object 
+     * 
+     *  @param HttpServletRequest 
+     *  @param Object the object we are going to set
+     *  @param PrintWriter for test
+     *  @throws Exception
+     */
+    public static void setObject(HttpServletRequest request, Object toset, PrintWriter out) throws Exception {
+        Field[] attributs = toset.getClass().getDeclaredFields(); 
+        for(Field attribut : attributs){
+            Class <?> type = attribut.getType();
+            Function <String,?> parser = PARSING.get(type);
+            if (parser == null){
+                throw new Exception("Fieldtype not in PARSING: "+ type); 
+            }
+            out.println(attribut.getName());
+            Object tosave = parser.apply(request.getParameter(attribut.getName()));
+            String method = "set"+attribut.getName();
+            toset.getClass().getMethod(method, attribut.getType()).invoke(toset, tosave);
+        }
+        // Object checkreturn= Class.forName(check.getclassName()).getMethod(check.getmethod()).invoke(Class.forName(check.getclassName()).getConstructor().newInstance());
+    }
+
     /**
      * function return the jsp name of the invoked method 
      * 

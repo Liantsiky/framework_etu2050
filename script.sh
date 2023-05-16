@@ -14,7 +14,9 @@ cd ../
 cp -r ./src/models ./MyApps/WEB-INF/classes
 
 cd ./MyApps
-jar -cfv  ../MyProject.war *.jsp WEB-INF
-cd ../
+jar -cfv  ../MyProject.war WEB-INF
+cd ../src/pages
+jar uf  ../../MyProject.war *.jsp 
+cd ../../
 
 mv MyProject.war /home/liantsiky/ITU/tools/apache-tomcat-10.0.27/webapps/

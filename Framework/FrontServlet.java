@@ -10,6 +10,7 @@ import etu2050.framework.Modelview;
 import jakarta.servlet.ServletConfig;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jakarta.servlet.ServletException;
@@ -61,24 +62,32 @@ public class FrontServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         response.setContentType("text/plain");
         PrintWriter out = response.getWriter();
-
+        
         try {
             String uri= request.getRequestURI().toString();
             String url = MyUtils.getURL(uri);
             if( this.getUrlMapping().containsKey(url)) {
                 Mapping check= (Mapping) getUrlMapping().get(url);
-                Class<?> closs = Class.forName(check.getclassName());
-                Object checkreturn= Class.forName(check.getclassName()).getMethod(check.getmethod()).invoke(Class.forName(check.getclassName()).getConstructor().newInstance());
+                //instance la classe
+                Object tosave = Class.forName(check.getclassName()).getConstructor().newInstance();
+                // maka ilay field ary invoke ilay set
+                MyUtils.setObject(request, tosave, out);
+                // out.println("Eto");
+
+                // Object checkreturn= Class.forName(check.getclassName()).getMethod(check.getmethod()).invoke(Class.forName(check.getclassName()).getConstructor().newInstance());
+                Object checkreturn= Class.forName(check.getclassName()).getMethod(check.getmethod()).invoke(tosave);
+                //set les fields de l'objet
                 if ( checkreturn instanceof Modelview){
                     Modelview page = (Modelview) checkreturn;
+                    // out.println(page.getData().keySet().toArray()[0].toString());
                     for(String key : page.getData().keySet()) {
                         request.setAttribute(key,page.getData().get(key));
-
                     }
                     request.getRequestDispatcher(page.getPageJsp()).forward(request,response);
                 }
             }
         } catch (Exception ex) {
+            out.println(ex);
             Logger.getLogger(FrontServlet.class.getName()).log(Level.SEVERE, null, ex);
 
         }
