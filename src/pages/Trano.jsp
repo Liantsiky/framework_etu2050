@@ -7,9 +7,6 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>MANDEHA VE</h1>
-    <% out.println(request.getAttribute("Nom")); %>
-    <% out.println(request.getAttribute("Age")); %>
-
+   
 </body>
-</Agel>
+</html>

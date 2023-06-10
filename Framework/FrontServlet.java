@@ -21,6 +21,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
+import etu2050.framework.annotations.Url;
+
 
 /**
  *
@@ -36,10 +38,6 @@ public class FrontServlet extends HttpServlet {
         
         try{
             ArrayList <Class<?>> test= MyUtils.getClasses("models", this.getUrlMapping());
-        //           for(int i=0; i< getUrlMapping().size(); i++){
-        //               System.out.println(MappingUrls);
-        //           }
-        //            Mapping map =  getUrlMapping().get(url);
         }catch(Exception ex){
             Logger.getLogger(FrontServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -62,24 +60,28 @@ public class FrontServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         response.setContentType("text/plain");
         PrintWriter out = response.getWriter();
-        
+        // for ( String key : getUrlMapping().keySet()) {
+        //     out.println(getUrlMapping().get(key).getmethod());
+        // }
         try {
             String uri= request.getRequestURI().toString();
             String url = MyUtils.getURL(uri);
             if( this.getUrlMapping().containsKey(url)) {
                 Mapping check= (Mapping) getUrlMapping().get(url);
+
                 //instance la classe
                 Object tosave = Class.forName(check.getclassName()).getConstructor().newInstance();
-                // maka ilay field ary invoke ilay set
-                MyUtils.setObject(request, tosave, out);
-                // out.println("Eto");
+                Object checkreturn = new Object();
 
-                // Object checkreturn= Class.forName(check.getclassName()).getMethod(check.getmethod()).invoke(Class.forName(check.getclassName()).getConstructor().newInstance());
-                Object checkreturn= Class.forName(check.getclassName()).getMethod(check.getmethod()).invoke(tosave);
-                //set les fields de l'objet
+                if (MyUtils.ifArgsExist(check) == true){
+                    checkreturn = MyUtils.getMethodResult(check, MyUtils.getParameterValues(request, response, out), out);
+                } else {
+                    MyUtils.setObject(request, tosave, out);
+                    checkreturn= Class.forName(check.getclassName()).getMethod(check.getmethod()).invoke(tosave);
+                }
+              
                 if ( checkreturn instanceof Modelview){
                     Modelview page = (Modelview) checkreturn;
-                    // out.println(page.getData().keySet().toArray()[0].toString());
                     for(String key : page.getData().keySet()) {
                         request.setAttribute(key,page.getData().get(key));
                     }

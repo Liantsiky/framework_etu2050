@@ -14,13 +14,18 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.Function;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 
 /**
  *
@@ -28,7 +33,10 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 public class MyUtils {
     
-    //attribut Hashmap contenant les classes et les functions qui les parse
+    
+    /**
+     * attribut Hashmap contenant les classes et les functions qui les parse
+     */
     public static final HashMap <Class <?>, Function<String,?>> PARSING = new HashMap<>();
     static{
         PARSING.put(int.class, Integer::parseInt);
@@ -36,8 +44,75 @@ public class MyUtils {
         PARSING.put(String.class, Function.identity());
     }
     
-
     /**
+     * Call the method who needs arguments and return the object it returns
+     * @param maps the mapping which contains the name of the class and the method
+     * @param args the arguments that the method needs
+     * @return the object that the method return
+     */
+    public static Object getMethodResult(Mapping maps , String [] args,PrintWriter out) throws Exception {
+        Object tosave = Class.forName(maps.getclassName()).getConstructor().newInstance();
+        Method[] methods =  Class.forName(maps.getclassName()).getDeclaredMethods();
+        int indice_method = 0;
+        for(int i = 0; i<methods.length; i++) {
+            if(methods[i].getName() == maps.getmethod()){
+                indice_method = i;
+            }
+        } 
+        //get the arguements type of the method
+        Type [] parameterTypes = methods[indice_method].getGenericParameterTypes();
+
+        //parsing the table of String to the type of the arguments 
+        Object [] argsParse = new Object[parameterTypes.length];
+        for (int i = 0; i < parameterTypes.length; i++) {
+            Function <String, ?> parser = PARSING.get(parameterTypes[i]);
+            argsParse[i] = parser.apply(args[i]);
+        }
+        //invoke the method with the args and get the result
+        Object result = methods[indice_method].invoke(tosave,argsParse);
+        return result;
+    }
+    /**
+     * check if the method has arguments or not
+     * @param maps the mapping that contains the class and method name 
+     * @return  true if contains else false
+     * @throws Exception
+     */
+    public static boolean ifArgsExist(Mapping maps) throws Exception {
+        boolean result = false;
+        // Object tosave = Class.forName(maps.getclassName()).getConstructor().newInstance();
+        Method[] methods =  Class.forName(maps.getclassName()).getDeclaredMethods();
+        int indice_method = 0;
+        for(int i = 0; i<methods.length; i++) {
+            if(methods[i].getName() == maps.getmethod()){
+                indice_method = i;
+            }
+        } 
+        if(methods[indice_method].getAnnotation(Url.class).args() == true){
+            result = true;
+        }
+        return result;
+    }
+    /**
+     * Get the values of the parameters in the page
+     * @param HttpServletRequest
+     * @param HttpServletResponse
+     * @param PrintWriter
+     * @return a table of String, values of the parameter
+     */
+    public static String [] getParameterValues(HttpServletRequest request, HttpServletResponse response ,PrintWriter out) throws Exception {
+        List <String> parametersName = Collections.list(request.getParameterNames());
+        String [] result = new String[parametersName.size()];
+        
+       for(int i = 0; i< parametersName.size(); i++) {
+            // out.println(parametersName.get(i));
+            result[i] = request.getParameter(parametersName.get(i));
+        }
+        return result;
+    }
+
+
+    /** 
      * function that set the attribut of the object 
      * 
      *  @param HttpServletRequest 
@@ -53,7 +128,6 @@ public class MyUtils {
             if (parser == null){
                 throw new Exception("Fieldtype not in PARSING: "+ type); 
             }
-            out.println(attribut.getName());
             Object tosave = parser.apply(request.getParameter(attribut.getName()));
             String method = "set"+attribut.getName();
             toset.getClass().getMethod(method, attribut.getType()).invoke(toset, tosave);

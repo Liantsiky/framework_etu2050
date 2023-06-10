@@ -17,4 +17,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface Url {
     public String lien() default "";
+    public boolean args() default false;
 }
+
+
+

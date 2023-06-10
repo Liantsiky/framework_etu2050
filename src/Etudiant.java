@@ -26,13 +26,13 @@ public class Etudiant {
     public void setAge(int ages ){this.Age=ages;}
 
     
-    @Url(lien="getEtudiant")
-    public Modelview getEtudiant(){
+    @Url(lien = "getEtudiant",args = true)
+    public Modelview getEtudiant(String nom, int nombre){
         HashMap <String,Object> o= new HashMap<>();
         Modelview result = new Modelview(o);
         
-        result.addItem("test", "bonjour");
-        result.addItem("test2", 123);
+        result.addItem("test", nom);
+        result.addItem("test2", nombre);
         result.setPageJsp("Etudiant.jsp");
         
         return result;
