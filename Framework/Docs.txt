@@ -1,0 +1,10 @@
+-Placer le framework dans la librairie
+-Pour trouver le dossier ou se trouve tous vos models veuillez placer le nom du dossiers dans root du web.xml
+-les fonctions en general doivent etre de retour type Modelview:
+    - String pageJsp pour la page ou on ira apres l'appel de fonction
+    -HashMap <String,Object>  data; ou on mettra les donnees a passer dans la page
+-Affichage en Json possible de 2 methodes(ne pas oublier de mettre la librairie GSON.jar dans lib) :
+    - utiliser l'annotation @RestAPI et la fonction doit rendre un tableau d'objet qui sera transformer en Json
+    - utiliser isJson de la classe Modelview
+-Si on veut creer une session, le parametre doit s'appeler "profile" et on a pas le droit de l'utiliser pour autre chose autre que pour creer un profile a stocker dans la session
+-Vous pouvez choisir le nom de la session pour connexion dans le web.xml sur sessionLogin

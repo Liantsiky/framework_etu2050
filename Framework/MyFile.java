@@ -21,18 +21,18 @@ public class MyFile {
     //Constructor
     public MyFile(Part theFile) throws Exception {
 
-        // setName(getFileName(theFile));
-        // InputStream stream = theFile.getInputStream();
-        // // int i = stream.available();
-        // byte[] buffer = new byte[512];
-        // ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        setName(theFile.getSubmittedFileName());
+        InputStream stream = theFile.getInputStream();
+        // int i = stream.available();
+        byte[] buffer = new byte[1024];
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        // int bytesRead;
-        // while ((bytesRead = stream.read(buffer) != -1))
-        // {
-        //     baos.write(buffer, 0, bytesRead);
-        // }
-        // setBytes(buffer); 
+        int bytesRead = 0;
+        while ((bytesRead = stream.read(buffer)) != -1)
+        {
+            baos.write(buffer, 0, bytesRead);
+        }
+        setBytes(baos.toByteArray()); 
     }
 
     // public byte[] searchForContent(Part part,String fileName){

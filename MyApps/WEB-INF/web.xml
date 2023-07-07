@@ -6,7 +6,11 @@
         <servlet-class>etu2050.framework.servlet.FrontServlet</servlet-class>
         <init-param>
             <param-name>root</param-name>
-            <param-value></param-value>
+            <param-value>models</param-value>
+        </init-param>
+        <init-param>
+            <param-name>sessionLogin</param-name>
+            <param-value>Connexion</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>
