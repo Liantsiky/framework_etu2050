@@ -4,13 +4,27 @@
  */
 package models;
 
+import etu2050.framework.Modelview;
+import etu2050.framework.annotations.Url;
+import java.util.HashMap;
+
+
 /**
  *
  * @author liantsiky
  */
 public class Maison {
     
-    public String getMaison(){
-        return "Trano";
+    @Url(lien="isaTrano",args = true)
+    public Modelview isaTrano(String nom, int age){
+
+        HashMap <String,Object> o= new HashMap<>();
+        Modelview result = new Modelview(o);
+        
+        result.addItem("Nom", nom);
+        result.addItem("Age", age);
+        result.setPageJsp("Affichage.jsp");
+        
+        return result;
     }
 }
