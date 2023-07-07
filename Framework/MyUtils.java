@@ -7,7 +7,7 @@ package etu2050.framework.myutils;
 import etu2050.framework.annotations.*;
 import etu2050.framework.Mapping;
 import etu2050.framework.Modelview;
-
+import etu2050.framework.MyFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +44,48 @@ public class MyUtils {
         PARSING.put(double.class, Double :: parseDouble);
         PARSING.put(String.class, Function.identity());
     }
-    
+
+    /**
+     * Get the name profile that the function require
+     * @param mapping
+     * @return
+     * @throws Exception
+     */
+    public static String getAuthProfile(Mapping mapping) throws Exception {
+        String result = "";
+        Method method = searchMethod(mapping);
+        result = method.getAnnotation(Auth.class).profile();
+        return result;
+    }
+    /**
+     * Check if the method have the annotation Auth and if have a profile
+     * @param mapping
+     * @return
+     * @throws Exception
+     */
+    public static boolean isAuthProfile(Mapping mapping) throws Exception {
+        boolean result = false;
+        Method method = searchMethod(mapping);
+        if(method.isAnnotationPresent(Auth.class) && method.getAnnotation(Auth.class).profile() != null){
+            result = true;
+        }
+        return result;
+    }
+
+    /**
+     * Check if the method have the annotation Auth
+     * @param mapping
+     * @return
+     * @throws Exception
+     */
+    public static boolean isAuth(Mapping mapping) throws Exception {
+        boolean result = false;
+        Method method = searchMethod(mapping);
+        if(method.isAnnotationPresent(Auth.class)){
+            result = true;
+        }
+        return result;
+    }
     /**
      * Check if the method has the annotation RestAPI
      * @param mapping
@@ -123,7 +164,7 @@ public class MyUtils {
                 argsParse[i] = parser.apply(arg);
             } 
             // else {
-            //     argsParse[i] = args[i];
+            //     argsParse[i] = new MyFile((Part) args[i]);
             // }
         }
         //invoke the method with the args and get the result

@@ -5,6 +5,8 @@
 package models;
 
 import etu2050.framework.annotations.Url;
+import etu2050.framework.*;
+
 
 import java.util.HashMap;
 
@@ -25,6 +27,17 @@ public class Etudiant {
     public void setNom(String name){this.Nom=name;}
     public void setAge(int ages ){this.Age=ages;}
 
+    @Url(lien = "fileUp",args = true)
+    public Modelview fileUp(MyFile files){
+        HashMap <String,Object> o= new HashMap<>();
+        Modelview result = new Modelview(o);
+        
+        result.addItem("test", files);
+        // result.addItem("test2", nombre);
+        result.setPageJsp("Etudiant2.jsp");
+        
+        return result;
+    }
     
     @Url(lien = "getEtudiant",args = true)
     public Modelview getEtudiant(String nom, int nombre){

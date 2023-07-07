@@ -5,7 +5,7 @@
 package models;
 
 import etu2050.framework.Modelview;
-import etu2050.framework.annotations.Url;
+import etu2050.framework.annotations.*;
 import java.util.HashMap;
 
 
@@ -17,7 +17,7 @@ public class Maison {
     
     @Url(lien="isaTrano",args = true)
     public Modelview isaTrano(String nom, int age){
-
+        
         HashMap <String,Object> o= new HashMap<>();
         Modelview result = new Modelview(o);
         
@@ -27,8 +27,9 @@ public class Maison {
         
         return result;
     }
-
+    
     @Url(lien="isaTranoNdray",args = true)
+    @Auth(profile = "Rindra")
     public Modelview isaTranoNdray(String nom, int age){
 
         HashMap <String,Object> o= new HashMap<>();

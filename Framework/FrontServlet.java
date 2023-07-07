@@ -14,9 +14,11 @@ import java.lang.reflect.Field;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+// import jakarta.servlet.http.HttpServlet;
+// import jakarta.servlet.http.HttpServletRequest;
+// import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
+
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,12 +33,16 @@ import etu2050.framework.annotations.Url;
  */
 public class FrontServlet extends HttpServlet {
     HashMap<String,Mapping> MappingUrls = new HashMap<String,Mapping>();
-    
+    String SessionConnect;
+
     @Override
     public void init(ServletConfig config) throws ServletException {
-//        String packageName = config.getInitParameter("root");
+       String packageName = config.getInitParameter("root");
+       String connexName = config.getInitParameter("sessionLogin");
+       this.setSessionConnect(connexName);
+        
         try{
-            ArrayList <Class<?>> test= MyUtils.getClasses("models", this.getUrlMapping());
+            ArrayList <Class<?>> test= MyUtils.getClasses(packageName, this.getUrlMapping());
         }catch(Exception ex){
             Logger.getLogger(FrontServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -59,18 +65,40 @@ public class FrontServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         response.setContentType("text/plain");
         PrintWriter out = response.getWriter();
+        HttpSession session = request.getSession();
         // for ( String key : getUrlMapping().keySet()) {
         //     out.println(getUrlMapping().get(key).getmethod());
         // }
         try {
             String uri= request.getRequestURI().toString();
             String url = MyUtils.getURL(uri);
-            if( this.getUrlMapping().containsKey(url)) {
-                Mapping check= (Mapping) getUrlMapping().get(url);
 
+            //prendre le paramater "profile" et verifier s'il existe
+           
+            if(request.getParameter("profile") != null) {
+                session.setAttribute(getSessionConnect(),request.getParameter("profile"));
+                // out.println(request.getSession().getAttribute(getSessionConnect()));
+            }
+
+            if( this.getUrlMapping().containsKey(url)) {
+
+                Mapping check= (Mapping) getUrlMapping().get(url);
                 //instance la classe
                 Object tosave = Class.forName(check.getclassName()).getConstructor().newInstance();
                 Object checkreturn = new Object();
+
+                if(MyUtils.isAuth(check) == true) {
+                    if(request.getSession().getAttribute(getSessionConnect()) == null) {
+                        request.getRequestDispatcher("NonAcces.jsp").forward(request,response);
+                        // out.println("Acces refuse");
+                    } 
+                }
+                if(MyUtils.isAuthProfile(check) == true) {
+                    if(request.getSession().getAttribute(getSessionConnect()).equals(MyUtils.getAuthProfile(check)) == false) {
+                        request.getRequestDispatcher("NonAcces.jsp").forward(request,response);
+                    //    out.println(request.getSession().getAttribute(getSessionConnect()));
+                    }
+                }
 
                 if (MyUtils.ifArgsExist(check) == true){
                     checkreturn = MyUtils.getMethodResult(check, MyUtils.getParameterValues(request, response, out), out);
@@ -91,7 +119,8 @@ public class FrontServlet extends HttpServlet {
                         request.setAttribute("DisplayJson",jsonStr);
                     }
                     request.getRequestDispatcher(page.getPageJsp()).forward(request,response);
-                } else if (MyUtils.isRestAPI(check) == true) {
+                //raha toa ka hafa mihintsy ilay instance 
+                 } else if (MyUtils.isRestAPI(check) == true) {
                     Object [] obj = (Object []) checkreturn;
                     Gson gsonObj = new Gson();
                     String jsonStr = gsonObj.toJson(obj);
@@ -161,11 +190,12 @@ public class FrontServlet extends HttpServlet {
     }// </editor-fold>
 
     // getters and setters    
-         public HashMap<String, Mapping> getUrlMapping() {
-            return MappingUrls;
-        }
-    
+        public HashMap<String, Mapping> getUrlMapping() { return MappingUrls;}
+        public String getSessionConnect(){return this.SessionConnect;}
+
         public void setUrlMapping(HashMap<String, Mapping> urlMapping) {
             this.MappingUrls = urlMapping;
         }
+        public void setSessionConnect(String session) { this.SessionConnect = session;}
+
 }
