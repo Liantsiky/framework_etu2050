@@ -7,11 +7,16 @@
         <title>Isa Trano</title>
     </head>
     <body>
-        <form action="isaTrano" method="post">
+        <%-- <form action="isaTrano" method="post">
             <p>Nom: <input type="text" name="Nom" value="Rakoto"></p>
             <p>Age: <input type="number" name="Age" value=1></p>
             <p><input type="submit" value="OK"></p>
-        </form>
+        </form> --%>
         <%-- <a href="liste"><button>Voir la liste</button></a> --%>
+        <form method="post" action="fileuploadservlet" enctype="multipart/form-data">
+            <input type="file" name="file" />
+            </br>
+            <input type="submit" value="Upload" />
+         </form>
     </body>
 </html>
