@@ -21,8 +21,9 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
-import etu2050.framework.annotations.Url;
+import com.google.gson.*;
 
+import etu2050.framework.annotations.Url;
 
 /**
  *
@@ -34,8 +35,6 @@ public class FrontServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
 //        String packageName = config.getInitParameter("root");
-        
-        
         try{
             ArrayList <Class<?>> test= MyUtils.getClasses("models", this.getUrlMapping());
         }catch(Exception ex){
@@ -80,10 +79,17 @@ public class FrontServlet extends HttpServlet {
                     checkreturn= Class.forName(check.getclassName()).getMethod(check.getmethod()).invoke(tosave);
                 }
               
-                if ( checkreturn instanceof Modelview){
+                if (checkreturn instanceof Modelview){
                     Modelview page = (Modelview) checkreturn;
-                    for(String key : page.getData().keySet()) {
-                        request.setAttribute(key,page.getData().get(key));
+                    if(page.getIsJson() == false){
+                        for(String key : page.getData().keySet()) {
+                            request.setAttribute(key,page.getData().get(key));
+                        }
+                    } else if (page.getIsJson() == true){
+                        Gson gsonObj = new Gson();
+                        String jsonStr = gsonObj.toJson(page.getData());
+                        request.setAttribute("DisplayJson",jsonStr);
+
                     }
                     request.getRequestDispatcher(page.getPageJsp()).forward(request,response);
                 }

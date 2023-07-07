@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.function.Function;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 
 
 /**
@@ -44,13 +45,55 @@ public class MyUtils {
         PARSING.put(String.class, Function.identity());
     }
     
+
+    /**
+     * Get the values of the parameters in the page
+     * @param HttpServletRequest
+     * @param HttpServletResponse
+     * @param PrintWriter
+     * @return a table of String, values of the parameter
+     */
+    public static Object [] getParameterValues(HttpServletRequest request, HttpServletResponse response ,PrintWriter out) throws Exception {
+        List <String> parametersName = Collections.list(request.getParameterNames());
+        Object [] result = new String[parametersName.size()];
+        
+       for(int i = 0; i< parametersName.size(); i++) {
+            // out.println(parametersName.get(i));
+            // if(MyUtils.isFile(request,parametersName.get(i),out) == true){
+            //     result[i] = request.getPart(parametersName.get(i));
+            // } else {
+                result[i] = request.getParameter(parametersName.get(i));
+            // }
+        }
+        return result;
+    }
+
+    /**
+     * Check if the parameter is a file or not
+     * @param request
+     * @param response
+     * @param out
+     * @return true if yes, else false
+     * @throws Exception
+     */
+    public static boolean isFile(HttpServletRequest request, String paramterName,PrintWriter out) throws Exception {
+        boolean result = false;
+        Part filePart = request.getPart(paramterName);
+        String disposition = filePart.getHeader("Content-Disposition");
+        if(disposition != null && disposition.startsWith("form-data") && filePart.getSubmittedFileName() != null){
+            result = true;
+        }
+        return result;
+    }
+    
     /**
      * Call the method who needs arguments and return the object it returns
+            result[i] = request.getParameter(parametersName.get(i));
      * @param maps the mapping which contains the name of the class and the method
      * @param args the arguments that the method needs
      * @return the object that the method return
      */
-    public static Object getMethodResult(Mapping maps , String [] args,PrintWriter out) throws Exception {
+    public static Object getMethodResult(Mapping maps , Object [] args,PrintWriter out) throws Exception {
         Object tosave = Class.forName(maps.getclassName()).getConstructor().newInstance();
         Method[] methods =  Class.forName(maps.getclassName()).getDeclaredMethods();
         int indice_method = 0;
@@ -65,13 +108,20 @@ public class MyUtils {
         //parsing the table of String to the type of the arguments 
         Object [] argsParse = new Object[parameterTypes.length];
         for (int i = 0; i < parameterTypes.length; i++) {
-            Function <String, ?> parser = PARSING.get(parameterTypes[i]);
-            argsParse[i] = parser.apply(args[i]);
+            if (args[i] instanceof String){
+                String arg = (String) args[i];
+                Function <String, ?> parser = PARSING.get(parameterTypes[i]);
+                argsParse[i] = parser.apply(arg);
+            } 
+            // else {
+            //     argsParse[i] = args[i];
+            // }
         }
         //invoke the method with the args and get the result
         Object result = methods[indice_method].invoke(tosave,argsParse);
         return result;
     }
+
     /**
      * check if the method has arguments or not
      * @param maps the mapping that contains the class and method name 
@@ -80,7 +130,6 @@ public class MyUtils {
      */
     public static boolean ifArgsExist(Mapping maps) throws Exception {
         boolean result = false;
-        // Object tosave = Class.forName(maps.getclassName()).getConstructor().newInstance();
         Method[] methods =  Class.forName(maps.getclassName()).getDeclaredMethods();
         int indice_method = 0;
         for(int i = 0; i<methods.length; i++) {
@@ -93,27 +142,10 @@ public class MyUtils {
         }
         return result;
     }
-    /**
-     * Get the values of the parameters in the page
-     * @param HttpServletRequest
-     * @param HttpServletResponse
-     * @param PrintWriter
-     * @return a table of String, values of the parameter
-     */
-    public static String [] getParameterValues(HttpServletRequest request, HttpServletResponse response ,PrintWriter out) throws Exception {
-        List <String> parametersName = Collections.list(request.getParameterNames());
-        String [] result = new String[parametersName.size()];
-        
-       for(int i = 0; i< parametersName.size(); i++) {
-            // out.println(parametersName.get(i));
-            result[i] = request.getParameter(parametersName.get(i));
-        }
-        return result;
-    }
-
+    
 
     /** 
-     * function that set the attribut of the object 
+     * function that set the attribute of the object 
      * 
      *  @param HttpServletRequest 
      *  @param Object the object we are going to set
