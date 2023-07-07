@@ -4,7 +4,7 @@
  */
 package etu2050.framework.myutils;
 
-import etu2050.framework.annotations.Url;
+import etu2050.framework.annotations.*;
 import etu2050.framework.Mapping;
 import etu2050.framework.Modelview;
 
@@ -45,7 +45,20 @@ public class MyUtils {
         PARSING.put(String.class, Function.identity());
     }
     
-
+    /**
+     * Check if the method has the annotation RestAPI
+     * @param mapping
+     * @return
+     * @throws Exception
+     */
+    public static boolean isRestAPI(Mapping mapping) throws Exception {
+        boolean result = false;
+        Method method = searchMethod(mapping);
+        if(method.isAnnotationPresent(RestAPI.class)){
+            result = true;
+        }
+        return result;
+    }
     /**
      * Get the values of the parameters in the page
      * @param HttpServletRequest
@@ -95,15 +108,11 @@ public class MyUtils {
      */
     public static Object getMethodResult(Mapping maps , Object [] args,PrintWriter out) throws Exception {
         Object tosave = Class.forName(maps.getclassName()).getConstructor().newInstance();
-        Method[] methods =  Class.forName(maps.getclassName()).getDeclaredMethods();
-        int indice_method = 0;
-        for(int i = 0; i<methods.length; i++) {
-            if(methods[i].getName() == maps.getmethod()){
-                indice_method = i;
-            }
-        } 
+       
+        Method method = searchMethod(maps);
         //get the arguements type of the method
-        Type [] parameterTypes = methods[indice_method].getGenericParameterTypes();
+        Type [] parameterTypes = method.getGenericParameterTypes();
+
 
         //parsing the table of String to the type of the arguments 
         Object [] argsParse = new Object[parameterTypes.length];
@@ -118,10 +127,27 @@ public class MyUtils {
             // }
         }
         //invoke the method with the args and get the result
-        Object result = methods[indice_method].invoke(tosave,argsParse);
+        Object result = method.invoke(tosave,argsParse);
+
         return result;
     }
-
+    /**
+     * Search the mapping method
+     * We have to do a loop because we don't now if the function have args or not
+     * @param maps
+     * @return
+     * @throws Exception
+     */
+    public static Method searchMethod(Mapping maps) throws Exception {
+        Method [] methods = Class.forName(maps.getclassName()).getDeclaredMethods();
+        int indice_method = 0;
+        for (int i = 0; i<methods.length; i++) {
+            if(methods[i].getName() == maps.getmethod()) {
+                indice_method = i;
+            }
+        }
+        return methods[indice_method];
+    }
     /**
      * check if the method has arguments or not
      * @param maps the mapping that contains the class and method name 
@@ -130,14 +156,10 @@ public class MyUtils {
      */
     public static boolean ifArgsExist(Mapping maps) throws Exception {
         boolean result = false;
-        Method[] methods =  Class.forName(maps.getclassName()).getDeclaredMethods();
-        int indice_method = 0;
-        for(int i = 0; i<methods.length; i++) {
-            if(methods[i].getName() == maps.getmethod()){
-                indice_method = i;
-            }
-        } 
-        if(methods[indice_method].getAnnotation(Url.class).args() == true){
+       
+        Method method = searchMethod(maps);
+        if(method.getAnnotation(Url.class).args() == true){
+
             result = true;
         }
         return result;
