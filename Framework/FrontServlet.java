@@ -89,9 +89,13 @@ public class FrontServlet extends HttpServlet {
                         Gson gsonObj = new Gson();
                         String jsonStr = gsonObj.toJson(page.getData());
                         request.setAttribute("DisplayJson",jsonStr);
-
                     }
                     request.getRequestDispatcher(page.getPageJsp()).forward(request,response);
+                } else if (MyUtils.isRestAPI(check) == true) {
+                    Object [] obj = (Object []) checkreturn;
+                    Gson gsonObj = new Gson();
+                    String jsonStr = gsonObj.toJson(obj);
+                    out.println(jsonStr);
                 }
             }
         } catch (Exception ex) {

@@ -8,7 +8,7 @@
     </head>
     <body>
         <h1> WHAT </h1>
-        <form action="isaTranoNdray" method="post">
+        <form action="isaTable" method="post">
             <p>Nom: <input type="text" name="Nom" value="Rakoto"></p>
             <p>Age: <input type="number" name="Age" value=1></p>
             <p><input type="submit" value="OK"></p>
